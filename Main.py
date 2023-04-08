@@ -1,6 +1,7 @@
 import arcade, atexit
 from StartMenu import *
 from GameView import *
+from PuaseView import PuaseMenu
 
 def main():
     """Main method"""
