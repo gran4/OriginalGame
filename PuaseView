@@ -1,6 +1,6 @@
 import arcade
 
-class PuaseMenu(arcade.View)
+class PuaseMenu(arcade.View):
     def __init__(self, game):
         self.game_view = game
         self.window = arcade.get_window()
