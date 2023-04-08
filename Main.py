@@ -6,7 +6,7 @@ from PuaseView import PuaseMenu
 def main():
     """Main method"""
     window = arcade.Window(1440, 900, "SantaFest Destiny", resizable=True)
-    startmenu = StartMenu()#MyGame()#StartMenu()
+    startmenu = MyGame(800, 600, "Hospital Invaders")()#MyGame()#StartMenu()
     window.show_view(startmenu)
     arcade.run()
 def foo():

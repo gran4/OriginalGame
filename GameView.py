@@ -10,6 +10,8 @@ python -m arcade.examples.starting_template
 import arcade
 from player import *
 
+from Enemies import *
+
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Better Move Sprite with Keyboard Example"
@@ -68,6 +70,8 @@ class MyGame(arcade.Window):
         self.player_sprite.center_y = 50
         self.player_list.append(self.player_sprite)
 
+        enemy = Enemy_Slinger(self, 312, 234)
+        self.Enemies.append(enemy)
     def on_draw(self):
         """ Render the screen. """
 
@@ -76,6 +80,7 @@ class MyGame(arcade.Window):
 
         # Draw all the sprites.
         self.player_list.draw()
+        self.Enemies.draw()
 
         # Call draw() on all your sprite lists below
     def update_player_speed(self):
@@ -100,6 +105,7 @@ class MyGame(arcade.Window):
         need it.
         """
         self.player_list.update()
+        [enemy.update(self, delta_time) for enemy in self.Enemies]
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
