@@ -64,6 +64,7 @@ class MyGame(arcade.Window):
 
         # Set the window background color
         self.background_color = arcade.color.AMAZON
+       
 
     def setup(self):
         """ Set up the game and initialize the variables. """
@@ -72,7 +73,11 @@ class MyGame(arcade.Window):
         self.player_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList(use_spatial_hash=True,
                                            spatial_hash_cell_size=128)
-        self.enemy_list = arcade.SpriteList()
+
+        self.Enemies = arcade.SpriteList()
+        self.OpenToEnemies = []
+        self.EnemyMap = {}
+        
 
         # Set up the player
         resource = ":resources:images/animated_characters/" \
@@ -87,7 +92,7 @@ class MyGame(arcade.Window):
         enemy = arcade.Sprite(resource, SPRITE_SCALING)
         enemy.center_x = SPRITE_SIZE * 4
         enemy.center_y = SPRITE_SIZE * 7
-        self.enemy_list.append(enemy)
+        self.Enemies.append(enemy)
 
         spacing = SPRITE_SIZE * 3
         for column in range(10):
@@ -150,7 +155,7 @@ class MyGame(arcade.Window):
         # Draw all the sprites.
         self.player_list.draw()
         self.wall_list.draw()
-        self.enemy_list.draw()
+        self.Enemies.draw()
 
         if self.path:
             arcade.draw_line_strip(self.path, arcade.color.BLUE, 2)
@@ -251,6 +256,87 @@ class MyGame(arcade.Window):
             self.left_pressed = False
         elif key == arcade.key.RIGHT:
             self.right_pressed = False
+        def generateEnemySpawner(self, width, length):
+
+        width *= 50
+        length *= 50
+        self.EnemyMap = {}
+
+        #NOTE: UNCOMMENT everything with SnowMap to visualize where enemies spawn
+        #self.SnowMap = {}
+        self.OpenToEnemies = []
+        x = 0
+        y = 0
+        while x <= width:
+            self.EnemyMap[x] = {}
+            #self.SnowMap[x] = {}
+            while y <= length:
+                self.EnemyMap[x][y] = 0
+                #self.SnowMap[x][y] = 0
+                y += 50
+
+            y = 0
+            x += 50
+    def EnemySpawnPos(self):
+        if len(self.OpenToEnemies) > 0:
+            random_num = random.randrange(0, len(self.OpenToEnemies))
+            return self.OpenToEnemies[random_num][0], self.OpenToEnemies[random_num][1]
+        elif len(self.People) > 0:
+            person = self.People[random.randrange(0, len(self.People))]
+            return person.center_x, person.center_y
+        elif self.population == 0:
+            self.End()
+        #elif len(self.Boats) > 0:
+        #    boat = self.Boats[random.randrange(0, len(self.Boats))]
+        #    return boat.center_x, boat.center_y
+        raise ReferenceError("BUG: Either no People in Spritelist or No place open to enemies")
+    def BuildingChangeEnemySpawner(self, x, y, placing=1, min_dist=100, max_dist= 300):
+        #NOTE: Placing=-1 is for destroying, keep at 1 if placing
+        x = round(x/50)*50
+        y = round(y/50)*50
+
+        for x2 in range(-max_dist, max_dist, 50):
+            if not 0 <= x2+x < SIZE_X:
+                continue
+            for y2 in range(-max_dist, max_dist, 50):
+                if not 0 <= y2+y < SIZE_Y:
+                    continue
+
+                x1 = x2+x
+                y1 = y2+y
+                
+                
+                if abs(x2)<=min_dist and abs(y2)<=min_dist:
+                    self.EnemyMap[x1][y1] -= placing
+                    #self.SnowMap[x1][y1] += placing
+                else:
+                    self.EnemyMap[x1][y1] += placing
+    
+                #NOTE: UPDATE open to Enemies list
+                if self.EnemyMap[x1][y1] > 0:
+                    if not (x1, y1) in self.OpenToEnemies:
+                        self.OpenToEnemies.append((x1, y1))
+                elif (x1, y1) in self.OpenToEnemies:
+                    self.OpenToEnemies.remove((x1, y1))
+                
+                
+                """ 
+                Snow = self.SnowMap[x1][y1]
+
+                land = arcade.get_sprites_at_point((x1, y1), self.Lands)
+                if not land:
+                    pass
+                elif Snow < 1 and land[0].typ == "Snow":
+                    land[0].texture = land[0].prev_texture
+                    land[0].typ = land[0].prev_typ
+                elif Snow >= 1 and land[0].typ != "Snow":
+                    land[0].prev_texture = land[0].texture
+                    land[0].prev_typ = land[0].typ
+                    land[0].typ = "Snow"
+                    #gul-li-ble person
+                    land[0].texture = arcade.load_texture("resources/Sprites/Snow.png")
+                 """
+
 
 
 def main():
